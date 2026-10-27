@@ -21,13 +21,14 @@ jobs:
           VERCEL_PROJECT_ID: ${{ vars.VERCEL_PROJECT_ID }}
         run: bash scripts/bootstrap-vercel-prod.sh
       - name: Deploy current SHA to prod
+        timeout-minutes: 8
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
           VERCEL_ORG_ID: ${{ vars.VERCEL_ORG_ID }}
           VERCEL_PROJECT_ID: ${{ steps.bootstrap.outputs.project_id }}
         run: |
-          npx vercel pull --yes --environment=production --token="$VERCEL_TOKEN"
-          npx vercel build --prod --token="$VERCEL_TOKEN"
-          npx vercel deploy --prebuilt --prod --token="$VERCEL_TOKEN"
+          npx --yes vercel@65.2.0 pull --yes --environment=production --token="$VERCEL_TOKEN"
+          npx --yes vercel@65.2.0 build --prod --token="$VERCEL_TOKEN"
+          npx --yes vercel@65.2.0 deploy --prebuilt --prod --token="$VERCEL_TOKEN"
       - name: Record project id
         run: echo "Created or reused ${{ steps.bootstrap.outputs.project_id }}"
