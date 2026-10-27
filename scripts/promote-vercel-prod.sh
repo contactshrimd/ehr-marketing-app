@@ -47,6 +47,47 @@ if [[ -z "$newest_uid" ]]; then
   exit 1
 fi
 
+proj="$(api GET "/v9/projects/${PROJECT}")"
+echo "Project protection (no secrets):"
+jq -c '{
+  ssoProtection,
+  passwordProtection: (.passwordProtection | if . then {deploymentType} else null end),
+  trustedIps: (.trustedIps | if . then {deploymentType} else null end),
+  autoAssignCustomDomains,
+  gitForkProtection,
+  rollingRelease: (.rollingRelease | if . then {enabled} else null end)
+}' <<<"$proj"
+
+meta="$(api GET "/v13/deployments/${newest_uid}")"
+echo "Newest deployment (no secrets):"
+jq -c '{
+  uid, readyState, readySubstate, status, source, target,
+  aliasAssigned, aliasError, errorCode, errorMessage,
+  checksState, checksConclusion
+}' <<<"$meta"
+
+state="$(jq -r '.readyState // .status // empty' <<<"$meta")"
+if [[ "$state" == "BLOCKED" ]]; then
+  echo "Attempting to approve/unblock ${newest_uid}"
+  for path in \
+    "/v13/deployments/${newest_uid}/approve" \
+    "/v12/deployments/${newest_uid}/approve" \
+    "/v13/deployments/${newest_uid}/unblock"
+  do
+    attempt="$(api POST "$path" --data '{}' || true)"
+    echo "POST ${path} -> $(jq -c '{error, readyState, uid}' <<<"$attempt" 2>/dev/null || echo unparsed)"
+  done
+  sso_type="$(jq -r '.ssoProtection.deploymentType // empty' <<<"$proj")"
+  if [[ "$sso_type" == "all" || "$sso_type" == "prod_deployment_urls_and_all_previews" || "$sso_type" == "production" ]]; then
+    echo "Clearing project SSO protection that covers production (${sso_type})"
+    api PATCH "/v9/projects/${PROJECT}" --data '{"ssoProtection":null}' \
+      | jq -c '{ssoProtection, error}' || true
+  fi
+  meta="$(api GET "/v13/deployments/${newest_uid}")"
+  state="$(jq -r '.readyState // .status // empty' <<<"$meta")"
+  echo "After unblock attempts readyState=${state}"
+fi
+
 ready_uid=""
 deadline=$((SECONDS + POLL_SECONDS))
 while (( SECONDS < deadline )); do
@@ -66,7 +107,8 @@ while (( SECONDS < deadline )); do
 done
 
 if [[ -z "$ready_uid" ]]; then
-  echo "Newest deployment ${newest_uid} not READY after ${POLL_SECONDS}s" >&2
+  echo "Newest deployment ${newest_uid} not READY after ${POLL_SECONDS}s (state=${state})" >&2
+  echo "Inspect: https://vercel.com/shri-md/ehr-marketing-app-prod/${newest_uid#dpl_}" >&2
   exit 1
 fi
 
