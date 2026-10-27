@@ -117,6 +117,16 @@ add_domain() {
       jq -c '{error, name: $n}' --arg n "$name" <<<"$result" || true
       return 0
     fi
+    # Re-dispatch after first attach: Vercel reports domain_already_in_use
+    # with this project's id. Treat same-project as success so deploy runs.
+    if [[ "$code" == "domain_already_in_use" ]]; then
+      local in_use_project
+      in_use_project="$(jq -r '.error.projectId // empty' <<<"$result")"
+      if [[ "$in_use_project" == "$PROJECT_ID" ]]; then
+        echo "Domain ${name} already attached to this project"
+        return 0
+      fi
+    fi
     echo "Failed to add ${name}:" >&2
     jq -c '{error}' <<<"$result" >&2
     exit 1
