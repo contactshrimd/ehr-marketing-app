@@ -24,8 +24,8 @@ export default function DocsPage() {
           platform capabilities
         </Link>{" "}
         page under Interoperability. For a specific integration question,{" "}
-        <Link href="/get-started" className="font-medium text-zinc-900 underline dark:text-zinc-50">
-          reach out
+        <Link href="/contact" className="font-medium text-zinc-900 underline dark:text-zinc-50">
+          contact the ShriMD team
         </Link>
         .
       </p>

@@ -17,6 +17,19 @@ const SITE_URL = "https://www.shrimd.com";
 
 export const BLOG_POSTS: BlogPost[] = [
   {
+    slug: "build-vs-rent-telehealth-stack",
+    title: "Build vs Rent: What a Telehealth Founder Actually Needs to Own",
+    description:
+      "White-label medical groups rent you clinicians, protocols, and pharmacies. Software rails rent you a storefront. Here's the stack a founder should own if they want a durable cash-pay telehealth practice.",
+    publishedAt: "2026-10-26",
+    body: [
+      "Most telehealth founders are sold one of two stories. The first is the operated white-label: someone else's clinicians, protocols, and pharmacy contracts, wearing your logo. The second is the storefront kit: a questionnaire builder and a checkout page, with clinical depth treated as an integration you will add later. Both can get a landing page live. Neither is the same as owning a clinical engine.",
+      "If you rent the medical group, you launch faster — and you inherit their formulary, their visit model, their pharmacy lock-in, and their ability to change the economics under you. If you only buy commerce rails, you still have to invent intake-to-chart, queue matching, supervision, audit, and routing. The interesting work is not the homepage. It is everything that happens after a patient submits.",
+      "What a founder should own is narrower and harder: tenant isolation that cannot be forgotten in one query; intake that becomes the chart; an async queue that matches license, credential, and network agreement at claim time; e-prescribing that is not a single hardcoded pharmacy; and an API so the brand site can change without forking the EHR. Providers can be yours or contracted. Pharmacies can be swapped. The record stays on your side of the contract.",
+      "ShriMD is built for that ownership model. It is cash-pay and async-first on purpose. It does not supply a nationwide clinician network, insurance billing, labs, or controlled-substance prescribing. Those are honest non-goals. If you want to rent a turnkey medical group, that is a different category of vendor. If you want to build a practice you still recognize in three years, talk to us about the engine — not the costume.",
+    ],
+  },
+  {
     slug: "why-async-first-not-a-calendar",
     title: "Why ShriMD Is Async-First, Not a Scheduling Calendar With Extra Steps",
     description:

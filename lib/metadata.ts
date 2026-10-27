@@ -16,27 +16,33 @@ const SITE_NAME = "ShriMD";
 export const PAGES: PageMeta[] = [
   {
     path: "/",
-    title: "ShriMD — Multi-Tenant EHR & Telehealth Infrastructure",
+    title: "ShriMD — Build a Telehealth Brand on a Clinical Engine You Own",
     description:
-      "A multi-tenant EHR and clinical engine for cash-pay telehealth practices — async-first triage, provider network management, and e-prescribing, exposed through a real API and webhooks, or a ready-made provider/admin experience.",
+      "ShriMD is the multi-tenant EHR for founders building cash-pay telehealth: async intake and queue, your providers, your pharmacy routing, and a real API — not a rented medical group.",
   },
   {
     path: "/platform",
-    title: "Platform Capabilities — ShriMD",
+    title: "Platform Features — ShriMD Clinical Engine",
     description:
-      "How ShriMD handles intake, async triage, scheduling, clinical documentation, e-prescribing, compliance, interoperability, and provider/pharmacy network administration — structured the way you actually evaluate an EHR vendor.",
+      "The ShriMD feature catalog: tenant isolation, patient journey, async clinical queue, charting, e-prescribing, pharmacy routing, provider apps, ops console, and APIs — plus what we deliberately do not ship yet.",
   },
   {
     path: "/pricing",
-    title: "Pricing — ShriMD",
+    title: "Pricing — Talk Through Your Telehealth Build",
     description:
-      "ShriMD pricing is scoped per deal at this stage. Tell us about your practice and we'll follow up with a real conversation, not a self-serve calculator.",
+      "ShriMD pricing is scoped to your volume, verticals, and who brings providers and pharmacies. No public rate card. A person on the ShriMD team follows up.",
   },
   {
     path: "/get-started",
-    title: "Get Started — ShriMD",
+    title: "Get Started — Talk to the ShriMD Team",
     description:
-      "Tell us about your practice and what you're evaluating. A real person follows up — this form doesn't create any account or platform access on its own.",
+      "Tell the ShriMD team what you want to build. A person follows up. This form does not create an account or any platform access.",
+  },
+  {
+    path: "/contact",
+    title: "Contact the ShriMD Team",
+    description:
+      "Reach the ShriMD team about launching or migrating a cash-pay telehealth practice. Human follow-up only — no self-serve signup.",
   },
   {
     path: "/docs",

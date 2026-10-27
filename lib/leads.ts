@@ -4,9 +4,11 @@ export interface LeadSubmission {
   companyName: string;
   contactName: string;
   contactEmail: string;
+  phone: string; // "" is valid — optional
   expectedPatientVolume: string;
   conditionsUnderEvaluation: string;
-  currentVendor: string; // "" is valid — optional per spec
+  currentVendor: string; // "" is valid — optional
+  message: string;
 }
 
 const REQUIRED_FIELDS: (keyof LeadSubmission)[] = [
@@ -15,6 +17,7 @@ const REQUIRED_FIELDS: (keyof LeadSubmission)[] = [
   "contactEmail",
   "expectedPatientVolume",
   "conditionsUnderEvaluation",
+  "message",
 ];
 
 export class LeadValidationError extends Error {
@@ -41,13 +44,17 @@ function requireEnv(name: string): string {
 
 function formatLeadEmail(submission: LeadSubmission): string {
   return [
-    `New qualified lead from shrimd.com/get-started`,
+    `New qualified lead from shrimd.com`,
     ``,
     `Company: ${submission.companyName}`,
     `Contact: ${submission.contactName} <${submission.contactEmail}>`,
+    `Phone: ${submission.phone || "(none given)"}`,
     `Expected patient volume: ${submission.expectedPatientVolume}`,
     `Conditions/verticals under evaluation: ${submission.conditionsUnderEvaluation}`,
     `Current EHR/vendor: ${submission.currentVendor || "(none given)"}`,
+    ``,
+    `What they want to build:`,
+    submission.message,
   ].join("\n");
 }
 
