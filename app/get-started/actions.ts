@@ -16,9 +16,11 @@ export async function submitLeadAction(_prevState: LeadFormState, formData: Form
     companyName: String(formData.get("company_name") ?? ""),
     contactName: String(formData.get("contact_name") ?? ""),
     contactEmail: String(formData.get("contact_email") ?? ""),
+    phone: String(formData.get("phone") ?? ""),
     expectedPatientVolume: String(formData.get("expected_patient_volume") ?? ""),
     conditionsUnderEvaluation: String(formData.get("conditions_under_evaluation") ?? ""),
     currentVendor: String(formData.get("current_vendor") ?? ""),
+    message: String(formData.get("message") ?? ""),
   };
 
   try {

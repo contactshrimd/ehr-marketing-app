@@ -1,4 +1,6 @@
 import { describe, expect, it } from "vitest";
+import { PAGES } from "@/lib/metadata";
+import { BLOG_POSTS } from "@/lib/blog";
 import { checkPageMetadata, checkBlogPosts, runGuardrails } from "@/scripts/seo-guardrails";
 
 // SC-003: the SEO guardrail passes with zero violations across all pages
@@ -14,6 +16,16 @@ describe("SEO guardrails", () => {
 
   it("runGuardrails aggregates both checks", () => {
     expect(runGuardrails()).toEqual([]);
+  });
+
+  it("registers /contact with metadata distinct from /get-started", () => {
+    const contact = PAGES.find((page) => page.path === "/contact");
+    const getStarted = PAGES.find((page) => page.path === "/get-started");
+    expect(contact).toBeDefined();
+    expect(getStarted).toBeDefined();
+    expect(contact!.title).not.toBe(getStarted!.title);
+    expect(contact!.description).not.toBe(getStarted!.description);
+    expect(BLOG_POSTS.some((post) => post.slug === "build-vs-rent-telehealth-stack")).toBe(true);
   });
 
   it("flags a duplicate title as a real violation (proves the guardrail actually detects problems)", async () => {
