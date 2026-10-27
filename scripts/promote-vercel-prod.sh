@@ -78,11 +78,9 @@ if [[ "$state" == "BLOCKED" ]]; then
     echo "POST ${path} -> $(jq -c '{error, readyState, uid}' <<<"$attempt" 2>/dev/null || echo unparsed)"
   done
   sso_type="$(jq -r '.ssoProtection.deploymentType // empty' <<<"$proj")"
-  if [[ "$sso_type" == "all" || "$sso_type" == "prod_deployment_urls_and_all_previews" || "$sso_type" == "production" ]]; then
-    echo "Clearing project SSO protection that covers production (${sso_type})"
-    api PATCH "/v9/projects/${PROJECT}" --data '{"ssoProtection":null}' \
-      | jq -c '{ssoProtection, error}' || true
-  fi
+  echo "SSO deploymentType=${sso_type:-none}; scoping protection to preview only"
+  api PATCH "/v9/projects/${PROJECT}" --data '{"ssoProtection":{"deploymentType":"preview"}}' \
+    | jq -c '{ssoProtection, error}' || true
   meta="$(api GET "/v13/deployments/${newest_uid}")"
   state="$(jq -r '.readyState // .status // empty' <<<"$meta")"
   echo "After unblock attempts readyState=${state}"
@@ -125,6 +123,12 @@ echo "Aliasing ${ALIAS} -> ${ready_uid}"
 alias_body="$(jq -n --arg alias "$ALIAS" --arg deploymentId "$ready_uid" \
   '{alias:$alias, deploymentId:$deploymentId}')"
 result="$(api POST "/v2/aliases" --data "$alias_body")"
+if jq -e '.error' <<<"$result" >/dev/null; then
+  echo "v2/aliases failed: $(jq -c '{error}' <<<"$result")"
+  echo "Trying v2/deployments/${ready_uid}/aliases"
+  result="$(api POST "/v2/deployments/${ready_uid}/aliases" \
+    --data "$(jq -n --arg alias "$ALIAS" '{alias:$alias}')")"
+fi
 if jq -e '.error' <<<"$result" >/dev/null; then
   echo "Alias failed:" >&2
   jq -c '{error}' <<<"$result" >&2
