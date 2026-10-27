@@ -89,12 +89,21 @@ if [[ "$state" == "BLOCKED" ]]; then
 fi
 
 ready_uid=""
+# SSO on vercel.app URLs reports BLOCKED even after a successful --prod
+# upload. Custom domains are excepted (all_except_custom_domains), so alias
+# the production deployment anyway.
+target="$(jq -r '.target // empty' <<<"$meta")"
+if [[ "$state" == "BLOCKED" && "$target" == "production" ]]; then
+  echo "Production deployment is SSO-gated on *.vercel.app; aliasing ${ALIAS}"
+  ready_uid="$newest_uid"
+fi
+
 deadline=$((SECONDS + POLL_SECONDS))
-while (( SECONDS < deadline )); do
+while [[ -z "$ready_uid" ]] && (( SECONDS < deadline )); do
   meta="$(api GET "/v13/deployments/${newest_uid}")"
   state="$(jq -r '.readyState // .status // empty' <<<"$meta")"
   echo "Newest ${newest_uid} readyState=${state}"
-  if [[ "$state" == "READY" ]]; then
+  if [[ "$state" == "READY" || ( "$state" == "BLOCKED" && "$target" == "production" ) ]]; then
     ready_uid="$newest_uid"
     break
   fi
