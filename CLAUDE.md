@@ -2,3 +2,31 @@
 For additional context about technologies to be used, project structure,
 shell commands, and other important information, read the current plan
 <!-- SPECKIT END -->
+
+## DEV release authority (OD-573 A60)
+
+This section is mirrored in `.cursor/rules/release-authority.mdc`.
+
+**spec-73** is the **only** agent allowed to change the ShriMD DEV environment (`shrimd-ehr-platform-dev`). spec-73 is the Claude Code release session in `ehr-platform-spec`, running under the founder's gcloud identity. No other agent may change DEV. That includes Cursor (IDE agent, `cursor-agent`, background agents) and every other Claude Code session.
+
+## Never run (any environment)
+- `gcloud run deploy`, `gcloud run services update`, `update-traffic`, `replace`, or revision tag changes.
+- `gcloud builds submit` or any Cloud Build trigger run.
+- `prisma migrate deploy`, `prisma migrate resolve`, `prisma db push`, or any SQL write (DDL, DML, GRANT/REVOKE) against Cloud SQL.
+- `gcloud sql` changes: patch, start/stop, users, backup restore.
+- `gcloud secrets` writes; IAM, service-account or Workload Identity changes.
+- `scripts/release/founder-release.ts` (`--plan` or apply), or any `scripts/governed/*` or `scripts/dev/*` run with `--apply` or `--execute`.
+- Dispatching or re-running deploy workflows or Full CI.
+
+Read-only work is fine: `describe`, `list`, `logging read`, and SQL inside `BEGIN READ ONLY`.
+
+## Instead
+Write the code, tests and specs. Open a PR, then stop. In the PR description, add a line starting **"Release handoff to spec-73:"** that says what must ship: service, migrations, flags and env.
+
+spec-73 then:
+1. writes the register record;
+2. runs `--plan`;
+3. executes only after the founder types the matching phrase: "approve build of <sha>", "approve migrate of <name>" or "approve promotion of <revision>".
+
+## If asked to deploy
+Reply "DEV releases go through spec-73 (OD-573 A60). The handoff is in the PR." and stop. Only the founder can change this rule, through a register amendment.
